@@ -51,11 +51,9 @@ rem #                                                                           
 rem #--------------------------------------------------------------------------------------#
 
 
-if exist accesschk.exe (
-	echo [*] accesschk.exe found, will be able to launch weak folder/services permissions lookup!
+if exist ./bin/accesschk.exe (
 	set accesschk=1
 ) else (
-	echo [!] accesschk.exe NOT found, won't be able to launch weak folder/services permissions lookup.. (file must be in this directory)
 	set accesschk=0
 )
 echo .
@@ -122,7 +120,7 @@ echo.
 rem powershell /? >NUL 2>&1
 rem tftp /? >NUL 2>&1
 rem wmic /? >NUL 2>&1
-rem accesschk.exe /? >NUL 2>&1
+rem .\bin\accesschk.exe /? >NUL 2>&1
 rem echo %errorlevel%
 
 
@@ -130,13 +128,16 @@ echo #-------------------------#
 echo #   Vulnerable Services   #
 echo #-------------------------#
 echo.
+
+echo %accesschk%
+echo.
 if %accesschk%==1 (
-	accesschk.exe /accepteula -uwcqv "Authenticated Users" * 
-	accesschk.exe /accepteula -uwcqv "Power Users" *
-	accesschk.exe /accepteula -uwcqv "Users" *
+	.\bin\accesschk.exe /accepteula -uwcqv "Authenticated Users" * 
+	.\bin\accesschk.exe /accepteula -uwcqv "Power Users" *
+	.\bin\accesschk.exe /accepteula -uwcqv "Users" *
 	
 ) else (
-	echo [!] Skipping, accesschk.exe not found.
+	echo [!] Skipping, .\bin\accesschk.exe not found.
 )
 echo.
 
@@ -145,10 +146,10 @@ echo #   Vulnerable Folder Permissions   #
 echo #-----------------------------------#
 echo.
 if %accesschk%==1 (
-	accesschk.exe /accepteula -uwdqs "Users" c:\
-	accesschk.exe /accepteula -uwdqs "Authenticated Users" c:\
+	.\bin\accesschk.exe /accepteula -uwdqs "Users" c:\
+	.\bin\accesschk.exe /accepteula -uwdqs "Authenticated Users" c:\
 ) else (
-	echo [!] Skipping, accesschk.exe not found.
+	echo [!] Skipping, .\bin\accesschk.exe not found.
 )
 echo.
 
@@ -157,10 +158,10 @@ echo #   Vulnerable File Permissions   #
 echo #---------------------------------#
 echo.
 if %accesschk%==1 (
-	accesschk.exe /accepteula -uwqs "Users" c:\*.*
-	accesschk.exe /accepteula -uwqs "Authenticated Users" c:\*.*
+	.\bin\accesschk.exe /accepteula -uwqs "Users" c:\*.*
+	.\bin\accesschk.exe /accepteula -uwqs "Authenticated Users" c:\*.*
 ) else (
-	echo [!] Skipping, accesschk.exe not found.
+	echo [!] Skipping, .\bin\accesschk.exe not found.
 )
 echo.
 
