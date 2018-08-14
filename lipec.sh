@@ -1,0 +1,193 @@
+#! /bin/bash
+echo "#--------------------------------------------#"
+echo "#      Linux Escalation Checker (start)      #"
+echo "#--------------------------------------------#"
+echo ""
+echo "#------------------------------------#"
+echo "#                                    #"
+echo "#                                    #"
+echo "#      Linux Escalation Checker      #"
+echo "#                                    #"
+echo "#         Robin Desir - 2018         #"
+echo "#                                    #"
+echo "#------------------------------------#"
+echo ""
+echo "**************************"
+echo "*       System info      *"
+echo "**************************"
+echo ""
+echo -e "OS\t"  $(cat /etc/issue)
+echo -e "Kernel\t" $(cat /proc/version)
+echo -e "Hostname " $(hostname)
+echo ""
+
+echo "******************************"
+echo "*       Networking info      *"
+echo "******************************"
+echo ""
+echo -e "Netinfo :"  
+echo -e "---------"
+echo ""
+/sbin/ifconfig -a
+echo -e "Route :"  
+echo -e "-------"
+echo ""
+route
+echo ""
+echo -e "Active connection:"  
+echo -e "------------------"
+echo ""
+netstat -laputen
+echo ""
+
+echo "******************************"
+echo "*       FileSystem Info      *"
+echo "******************************"
+echo ""
+echo -e "Mount :"  
+echo -e "-------"
+echo ""
+mount
+echo ""
+echo -e "FSTAB :"  
+echo -e "-------"
+echo ""
+cat /etc/fstab 2>/dev/null
+echo ""
+
+echo "************************"
+echo "*       CRON Info      *"
+echo "************************"
+echo ""
+echo -e "CRON :"  
+echo -e "------"
+echo ""
+ls -la /etc/cron* 2>/dev/null
+echo ""
+echo -e "CRONW :"  
+echo -e "-------"
+echo ""
+ls -laR /etc/cron* 2>/dev/null | awk '$1 ~ /w.$/' 2>/dev/null
+echo ""
+
+echo "************************************"
+echo "*       Users and Environment      *"
+echo "************************************"
+echo ""
+echo -e "Whoami :"  
+echo -e "--------"
+echo ""
+whoami
+echo ""
+echo -e "ID :"  
+echo -e "----"
+echo ""
+id
+echo ""
+echo -e "All users :"  
+echo -e "-----------"
+echo ""
+cat /etc/passwd
+echo ""
+echo -e "Super users :"  
+echo -e "-------------"
+echo ""
+grep -v -E '^#' /etc/passwd | awk -F: '$3 == 0{print $1}'
+echo ""
+echo -e "Command History :"  
+echo -e "-----------------"
+echo ""
+ls -la /root/.*_history 2>/dev/null
+echo ""
+echo -e "Environment :"  
+echo -e "-------------"
+echo ""
+env 2>/dev/null | grep -v 'LS_COLORS'
+echo ""
+echo -e "Sudoers (privileged):"  
+echo -e "---------------------"
+echo ""
+cat /etc/sudoers 2>/dev/null | grep -v '#' 2>/dev/null
+echo ""
+echo -e "Logged in User Activity:"  
+echo -e "------------------------"
+echo ""
+w 2>/dev/null
+echo ""
+
+echo "***************************************"
+echo "*       Process and Applications      *"
+echo "***************************************"
+echo ""
+echo "Sudo Version :"
+echo "--------------"
+sudo -V | grep version 2>/dev/null
+echo ""
+echo "Apache Version and Modules :"
+echo "----------------------------"
+apache2 -v; apache2ctl -M; httpd -v; apachectl -l 2>/dev/null
+echo ""
+echo "Apache Config File :"
+echo "--------------------"
+cat /etc/apache2/apache2.conf 2>/dev/null
+echo ""
+
+echo "**************************************************"
+echo "*       Tools/Languages for sploit building      *"
+echo "**************************************************"
+echo ""
+echo -e "vi\t :!bash\t:set shell=/bin/bash"
+echo -e "awk\t awk 'BEGIN {system(\"/bin/bash\")}"
+echo -e "perl\t perl-e 'exec\"/bin/bash\";'"
+echo -e "find\t find / -exec /usr/bin/awk 'BEGIN {system(\"/bin/bash\")}"
+echo -e "nmap\t --interactive"
+echo ""
+
+echo "******************************************************"
+echo "*       File and Directory Permissions/Contents      *"
+echo "******************************************************"
+echo ""
+echo -e "World Writables Directories for User/Group 'Root':"  
+echo -e "--------------------------------------------------"
+echo ""
+find / \( -wholename '/home/homedir*' -prune \) -o \( -type d -perm -0002 \) -exec ls -ld '{}' ';' 2>/dev/null | grep root
+echo ""
+echo -e "World Writables Directories for User other than Root:"  
+echo -e "-----------------------------------------------------"
+echo ""
+find / \( -wholename '/home/homedir*' -prune \) -o \( -type d -perm -0002 \) -exec ls -ld '{}' ';' 2>/dev/null | grep -v root
+echo ""
+echo -e "World Writables Files:"  
+echo -e "----------------------"
+echo ""
+find / \( -wholename '/home/homedir/*' -prune -o -wholename '/proc/*' -prune \) -o \( -type f -perm -0002 \) -exec ls -l '{}' ';' 2>/dev/null
+echo ""
+echo -e "SUID/SGID Files and Directories:"  
+echo -e "--------------------------------"
+echo ""
+find / \( -perm -2000 -o -perm -4000 \) -exec ls -ld {} \; 2>/dev/null
+echo ""
+echo -e "Checking if root's home folder is accessible:"  
+echo -e "---------------------------------------------"
+echo ""
+ls -ahlR /root 2>/dev/null
+echo ""
+echo -e "Logs containing keyword 'password':"  
+echo -e "-----------------------------------"
+echo ""
+find /var/log -name '*.log' 2>/dev/null | xargs -l10 egrep 'pwd|password' 2>/dev/null
+echo ""
+echo -e "Config files containing keyword 'password':"  
+echo -e "-------------------------------------------"
+echo ""
+find /etc -name '*.c*' 2>/dev/null | xargs -l10 egrep 'pwd|password' 2>/dev/null
+echo ""
+echo -e "Shadow File (privileged):"  
+echo -e "-------------------------"
+echo ""
+cat /etc/shadow 2>/dev/null
+echo ""
+echo ""
+echo "#------------------------------------------#"
+echo "#      Linux Escalation Checker (end)      #"
+echo "#------------------------------------------#"
